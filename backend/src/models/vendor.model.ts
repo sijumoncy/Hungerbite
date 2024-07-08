@@ -10,7 +10,7 @@ interface IVendorDoc extends Document {
   address: string;
   password: string;
   salt: string;
-  serviceAvaialble: string;
+  serviceAvaialble: boolean;
   rating: string;
   //   foods: any;
   coverImages: [string];

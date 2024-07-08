@@ -83,3 +83,25 @@ export const updateVendorProfile = async (
   }
   return res.json({ message: "vendor not found" });
 };
+
+/**
+ * update Vendor Profile
+ */
+export const updateVendorServiceAvailability = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  if (user) {
+    const existingVendor = await findVendor(user._id);
+    if (existingVendor !== null) {
+      existingVendor.serviceAvaialble = !existingVendor.serviceAvaialble;
+      const updatedVendor = await existingVendor.save();
+      return res.json({ message: "updated successfully", data: updatedVendor });
+    }
+
+    return res.json(existingVendor);
+  }
+  return res.json({ message: "vendor not found" });
+};
