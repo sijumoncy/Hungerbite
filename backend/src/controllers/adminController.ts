@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { ICreateVendor } from "../dto";
 import { VendorModel } from "../models";
+import { hashPassword } from "../utils";
 
 /**
  * create new vendor
@@ -23,22 +24,32 @@ export const createVendor = async (
     address,
   } = <ICreateVendor>req.body;
 
+  // check exist
+  const existingVendor = await VendorModel.findOne({ email: email });
+
+  if (existingVendor !== null) {
+    return res.json({ message: "A Vendor with this email id is exist" });
+  }
+
+  // ecrypt password by generate salt
+  const hashed = await hashPassword(password);
+
   const createdVendor = await VendorModel.create({
     name: name,
     email: email,
     foodType: foodType,
     ownerName: ownerName,
-    password: password,
+    password: hashed.pwd,
     phone: phone,
     pincode: pincode,
     address: address,
     rating: 0,
-    salt: "",
+    salt: hashed.salt,
     serviceAvaialble: [],
     coverImages: [],
   });
 
-  return res.json({ name });
+  return res.json(createdVendor);
 };
 
 /**
