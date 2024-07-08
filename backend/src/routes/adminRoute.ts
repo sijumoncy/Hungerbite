@@ -18,9 +18,6 @@ router.get("/vendor", getVendors);
  */
 router.get("/vendor/:id", getVendorById);
 
-router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  console.log("in admin route");
-  res.json({ message: "admin route" });
-});
+// TODO : handle unknown endpoits
 
 export { router as adminRoute };

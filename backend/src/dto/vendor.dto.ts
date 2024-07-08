@@ -10,3 +10,8 @@ export interface ICreateVendor {
   address: string;
   password: string;
 }
+
+export interface IVendorLoginInputs {
+  email: string;
+  pasword: string;
+}

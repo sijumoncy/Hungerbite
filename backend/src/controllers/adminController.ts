@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { ICreateVendor } from "../dto";
 import { VendorModel } from "../models";
-import { hashPassword } from "../utils";
+import { generateSalt, hashPassword } from "../utils";
 
 /**
  *
@@ -57,19 +57,20 @@ export const createVendor = async (
   }
 
   // ecrypt password by generate salt
-  const hashed = await hashPassword(password);
+  const generatedSalt = await generateSalt();
+  const hashedPwd = await hashPassword(password, generatedSalt);
 
   const createdVendor = await VendorModel.create({
     name: name,
     email: email,
     foodType: foodType,
     ownerName: ownerName,
-    password: hashed.pwd,
+    password: hashedPwd,
     phone: phone,
     pincode: pincode,
     address: address,
     rating: 0,
-    salt: hashed.salt,
+    salt: generatedSalt,
     serviceAvaialble: [],
     coverImages: [],
   });

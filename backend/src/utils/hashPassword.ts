@@ -5,13 +5,17 @@ export async function generateSalt() {
 }
 
 export async function hashPassword(
-  password: string
-): Promise<{ pwd: string; salt: string }> {
-  const generatedSalt = await generateSalt();
-  const hashedPassword = await bcrypt.hash(password, generatedSalt);
+  password: string,
+  salt: string
+): Promise<string> {
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+}
 
-  return {
-    pwd: hashedPassword,
-    salt: generatedSalt,
-  };
+export async function verifyPassword(
+  password: string,
+  hashedPassword: string,
+  salt: string
+) {
+  return (await hashPassword(password, salt)) === hashedPassword;
 }

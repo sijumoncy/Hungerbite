@@ -1,10 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
+import { vendorLogin } from "../controllers";
 
 const router = express.Router();
 
-router.get("/", (req: Request, res: Response, next: NextFunction) => {
-  console.log("in vendor routes");
-  res.json({ message: "vendor route" });
-});
+/**
+ * Vendor login
+ */
+router.post("/login", vendorLogin);
 
 export { router as vendorRoute };
