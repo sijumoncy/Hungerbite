@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-import { vendorLogin } from "../controllers";
+import { getVendorProfile, vendorLogin } from "../controllers";
 
 const router = express.Router();
 
@@ -7,5 +7,10 @@ const router = express.Router();
  * Vendor login
  */
 router.post("/login", vendorLogin);
+
+/**
+ * Get Vendor profile
+ */
+router.get('/profile', getVendorProfile)
 
 export { router as vendorRoute };
