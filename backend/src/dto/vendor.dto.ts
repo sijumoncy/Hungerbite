@@ -11,6 +11,13 @@ export interface ICreateVendor {
   password: string;
 }
 
+export interface IUpdateVendorProfileInputs {
+  name: string;
+  address: string;
+  phone: string;
+  foodTypes: [string];
+}
+
 export interface IVendorLoginInputs {
   email: string;
   pasword: string;

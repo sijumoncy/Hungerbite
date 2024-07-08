@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import { IVendorLoginInputs } from "../dto";
+import { IUpdateVendorProfileInputs, IVendorLoginInputs } from "../dto";
 import { findVendor } from "./adminController";
 import { verifyPassword } from "../utils";
 import { generateToken } from "../utils/token";
@@ -50,6 +50,35 @@ export const getVendorProfile = async (
   const user = req.user;
   if (user) {
     const existingVendor = await findVendor(user._id);
+    return res.json(existingVendor);
+  }
+  return res.json({ message: "vendor not found" });
+};
+
+/**
+ * update Vendor Profile
+ */
+export const updateVendorProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { address, foodTypes, name, phone } = <IUpdateVendorProfileInputs>(
+    req.body
+  );
+  const user = req.user;
+  if (user) {
+    const existingVendor = await findVendor(user._id);
+    if (existingVendor !== null) {
+      existingVendor.name = name;
+      existingVendor.address = address;
+      existingVendor.foodType = foodTypes;
+      existingVendor.phone = phone;
+
+      const updatedVendor = await existingVendor.save();
+      return res.json({ message: "updated successfully", data: updatedVendor });
+    }
+
     return res.json(existingVendor);
   }
   return res.json({ message: "vendor not found" });
