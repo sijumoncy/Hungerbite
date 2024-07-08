@@ -1,5 +1,8 @@
 import express, { NextFunction, Request, Response } from "express";
 import {
+  addFoodController,
+  getFoodById,
+  getFoodController,
   getVendorProfile,
   updateVendorProfile,
   updateVendorServiceAvailability,
@@ -13,6 +16,17 @@ const router = express.Router();
  * Vendor login
  */
 router.post("/login", vendorLogin);
+
+/**
+ * Get foods
+ */
+router.get("/food", getFoodController);
+/**
+ * get food by id
+ */
+router.get("/food/:id", getFoodById);
+
+// ===========================================  Authorized  ============================
 
 // Authorized routes
 router.use(authenticate);
@@ -30,5 +44,10 @@ router.patch("/profile", updateVendorProfile);
  * update service avialability status of vendor
  */
 router.patch("/service", updateVendorServiceAvailability);
+
+/**
+ * Food or Menu
+ */
+router.post("/food", addFoodController);
 
 export { router as vendorRoute };

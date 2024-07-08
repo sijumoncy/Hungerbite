@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import { IFoodDoc } from "./food.model";
 
 interface IVendorDoc extends Document {
   name: string;
@@ -12,7 +13,7 @@ interface IVendorDoc extends Document {
   salt: string;
   serviceAvaialble: boolean;
   rating: string;
-  //   foods: any;
+  foods: [IFoodDoc];
   coverImages: [string];
 }
 
@@ -29,12 +30,12 @@ const VendorSchema = new Schema(
     salt: { type: String, required: true },
     serviceAvaialble: { type: Boolean },
     rating: { type: String },
-    // foods: [
-    //   {
-    //     type: mongoose.SchemaTypes.ObjectId,
-    //     ref: "food",
-    //   },
-    // ],
+    foods: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "food",
+      },
+    ],
     coverImages: { type: [String] },
   },
   {

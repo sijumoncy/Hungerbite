@@ -3,6 +3,8 @@ import { IUpdateVendorProfileInputs, IVendorLoginInputs } from "../dto";
 import { findVendor } from "./adminController";
 import { verifyPassword } from "../utils";
 import { generateToken } from "../utils/token";
+import { ICreateFoodInput } from "../dto/food.dto";
+import { FoodModel } from "../models/food.model";
 
 /**
  * Vendor Login
@@ -104,4 +106,79 @@ export const updateVendorServiceAvailability = async (
     return res.json(existingVendor);
   }
   return res.json({ message: "vendor not found" });
+};
+
+/**
+ * Food create
+ */
+export const addFoodController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  if (user) {
+    const { category, description, foordType, name, price, readyTime } = <
+      ICreateFoodInput
+    >req.body;
+
+    const vendor = await findVendor(user._id);
+    if (vendor !== null) {
+      const createdFood = await FoodModel.create({
+        vendorId: vendor._id,
+        name: name,
+        description: description,
+        category: category,
+        foordType: foordType,
+        readyTime: readyTime,
+        price: price,
+        rating: 0,
+        images: [],
+      });
+
+      vendor.foods.push(createdFood);
+      const result = vendor.save();
+
+      return res.json({ message: "food added successfully ", data: result });
+    }
+  }
+  return res.json({ message: "failed to add food." });
+};
+
+/**
+ * Get Food by filters
+ * id , venodorId , category
+ */
+export const findFood = async (
+  id: string | undefined,
+  vendorId?: string,
+  category?: string
+) => {
+  if (vendorId) {
+    return await FoodModel.findOne({ vendorId: vendorId });
+  } else if (category) {
+    return await FoodModel.findOne({ category: category });
+  } else {
+    return await FoodModel.findById(id);
+  }
+};
+
+/**
+ * get all food
+ * TODO : implement paginations later
+ */
+export const getFoodController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const food = await FoodModel.find();
+  return food || [];
+};
+
+/**
+ * find by id
+ */
+export const getFoodById = async (id: string) => {
+  return findFood(id);
 };
