@@ -46,4 +46,11 @@ export const getVendorProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const user = req.user;
+  if (user) {
+    const existingVendor = await findVendor(user._id);
+    return res.json(existingVendor);
+  }
+  return res.json({ message: "vendor not found" });
+};
