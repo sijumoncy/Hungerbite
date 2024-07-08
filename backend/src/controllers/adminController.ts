@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { ICreateVendor } from "../dto";
+import { VendorModel } from "../models";
 
 /**
  * create new vendor
@@ -21,6 +22,21 @@ export const createVendor = async (
     pincode,
     address,
   } = <ICreateVendor>req.body;
+
+  const createdVendor = await VendorModel.create({
+    name: name,
+    email: email,
+    foodType: foodType,
+    ownerName: ownerName,
+    password: password,
+    phone: phone,
+    pincode: pincode,
+    address: address,
+    rating: 0,
+    salt: "",
+    serviceAvaialble: [],
+    coverImages: [],
+  });
 
   return res.json({ name });
 };
