@@ -59,7 +59,15 @@ export const getVendors = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const vendors = await VendorModel.find();
+
+  if (vendors !== null) {
+    return res.json(vendors);
+  }
+
+  return [];
+};
 
 /**
  * get vendor by Id
@@ -68,4 +76,12 @@ export const getVendorById = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const vendorId = req.params.id;
+  const vendor = await VendorModel.findById(vendorId);
+  if (vendor !== null) {
+    return res.json(vendor);
+  }
+
+  return null;
+};
