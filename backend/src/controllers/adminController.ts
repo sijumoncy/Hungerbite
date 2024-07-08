@@ -4,6 +4,31 @@ import { VendorModel } from "../models";
 import { hashPassword } from "../utils";
 
 /**
+ *
+ * @param id
+ * @param email
+ * @param phone
+ * @returns
+ * Util function to get vendor by unique fields
+ */
+export const findVendor = async (
+  id: string | undefined,
+  email?: string,
+  phone?: string
+) => {
+  if (email) {
+    const vendor = await VendorModel.findOne({ email: email });
+    return vendor;
+  } else if (phone) {
+    const vendor = await VendorModel.findOne({ phone: phone });
+    return vendor;
+  } else {
+    const vendor = VendorModel.findById(id);
+    return vendor;
+  }
+};
+
+/**
  * create new vendor
  */
 export const createVendor = async (
@@ -25,7 +50,7 @@ export const createVendor = async (
   } = <ICreateVendor>req.body;
 
   // check exist
-  const existingVendor = await VendorModel.findOne({ email: email });
+  const existingVendor = await findVendor(undefined, email);
 
   if (existingVendor !== null) {
     return res.json({ message: "A Vendor with this email id is exist" });
@@ -78,7 +103,7 @@ export const getVendorById = async (
   next: NextFunction
 ) => {
   const vendorId = req.params.id;
-  const vendor = await VendorModel.findById(vendorId);
+  const vendor = await findVendor(vendorId);
   if (vendor !== null) {
     return res.json(vendor);
   }
