@@ -3,7 +3,12 @@ import express, { NextFunction, Request, Response } from "express";
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
 import { SignupUserInputs } from "../dto/user.dto";
-import { generateOneTimePassword, generateSalt, hashPassword } from "../utils";
+import {
+  generateOneTimePassword,
+  generateSalt,
+  hashPassword,
+  sendOTP,
+} from "../utils";
 import { UserModel } from "../models/user.model";
 import { generateToken } from "../utils/token";
 
@@ -49,13 +54,26 @@ export const userSignup = async (
 
   if (result) {
     // send otp
+    const response = await sendOTP(otp, phone);
     // generate Token
-    const token = await generateToken({})
+    const token = await generateToken({
+      _id: result.id,
+      email: result.email,
+      verified: result.verified,
+    });
     // response
-    return res
-      .status(201)
-      .json({ message: "registration successful", data: result, token : token  });
+    return res.status(201).json({
+      message: "registration successful. Please verify your account",
+      data: {
+        token: token,
+        email: result.email,
+        verified: result.verified,
+        id: result.id,
+      },
+    });
   }
+
+  return res.status(400).json({ message: "signup failed" });
 };
 
 /**

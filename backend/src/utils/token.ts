@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
-import { AuthPayloadType, IVendorPayload } from "../dto";
+import { AuthPayloadType } from "../dto";
 import dotenv from "../config/dotenv";
 import { Request } from "express";
 
 /**
  * generate Token
  */
-export async function generateToken(payload: IVendorPayload) {
+export async function generateToken(payload: AuthPayloadType) {
   const token = jwt.sign(payload, dotenv.JWT_SECRET, { expiresIn: "30m" });
   return token;
 }

@@ -10,3 +10,9 @@ export class SignupUserInputs {
   @Length(6, 12)
   password: string;
 }
+
+export interface IUserPayload {
+  _id: string;
+  email: string;
+  verified: boolean;
+}
