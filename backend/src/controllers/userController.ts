@@ -20,6 +20,7 @@ export const userSignup = async (
   res: Response,
   next: NextFunction
 ) => {
+  // validate user data
   const userSignupInputs = plainToClass(SignupUserInputs, req.body);
 
   const InputErrors = await validate(userSignupInputs, {
@@ -32,11 +33,21 @@ export const userSignup = async (
 
   const { email, password, phone } = userSignupInputs;
 
+  // check for existing user
+  const existingUser = await UserModel.findOne({ email: email });
+
+  if (existingUser !== null) {
+    return res.status(409).json({ message: "Account already exist" });
+  }
+
+  // generate hashed pwd
   const salt = await generateSalt();
   const hashedPwd = await hashPassword(password, salt);
 
+  // generate otp
   const { otp, expiry: otp_expiry } = await generateOneTimePassword();
 
+  // create user
   const result = await UserModel.create({
     email: email,
     password: hashedPwd,
@@ -61,7 +72,7 @@ export const userSignup = async (
       email: result.email,
       verified: result.verified,
     });
-    // response
+
     return res.status(201).json({
       message: "registration successful. Please verify your account",
       data: {
@@ -92,7 +103,39 @@ export const userVerify = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const { otp } = req.body;
+  // TODO : need to take care userId also in input if verification without auth
+  const user = req.user;
+  if (user) {
+    const profile = await UserModel.findById(user._id);
+    if (profile) {
+      // verify otp and expiry time
+      if (profile.otp === parseInt(otp) && profile.otp_expiry <= new Date()) {
+        profile.verified = true;
+        const updatedUser = await profile.save();
+
+        // re generate token with verified true
+        const token = await generateToken({
+          _id: updatedUser.id,
+          email: updatedUser.email,
+          verified: updatedUser.verified,
+        });
+
+        return res.status(201).json({
+          message: "verified successfully",
+          data: {
+            token: token,
+            email: updatedUser.email,
+            verified: updatedUser.verified,
+            id: updatedUser.id,
+          },
+        });
+      }
+    }
+  }
+  return res.status(400).json({ message: "verification failed" });
+};
 
 /**
  * otp generate
