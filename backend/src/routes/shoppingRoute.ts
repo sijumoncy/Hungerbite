@@ -23,7 +23,7 @@ router.get("/top-restaurants/:pincode", getTopRestaurants);
 /**
  * food available in certain time
  */
-router.get("/food-in-given-time/:time", getFoodInCertainTime);
+router.get("/food-in-given-time/:pincode/:time", getFoodInCertainTime);
 
 /**
  * search food in the location
