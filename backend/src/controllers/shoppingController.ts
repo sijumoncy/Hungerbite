@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import { VendorModel } from "../models";
 import { IFoodDoc } from "../models/food.model";
-import { findVendor } from "./adminController";
 
 /**
  * get available foods based on pincode
