@@ -87,6 +87,33 @@ export const updateVendorProfile = async (
 };
 
 /**
+ * update Vendor Cover Image
+ */
+export const updateVendorCoverImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  if (user) {
+    const vendor = await findVendor(user._id);
+    if (vendor !== null) {
+      const files = req.files as [Express.Multer.File];
+      const images = files.map((file) => file.filename);
+
+      vendor.coverImages.push(...images);
+      const result = vendor.save();
+
+      return res.json({
+        message: "cover images updated successfully",
+        data: result,
+      });
+    }
+  }
+  return res.json({ message: "failed to update cover images." });
+};
+
+/**
  * update Vendor Profile
  */
 export const updateVendorServiceAvailability = async (

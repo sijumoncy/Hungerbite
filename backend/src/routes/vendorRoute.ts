@@ -4,6 +4,7 @@ import {
   getFoodById,
   getFoodController,
   getVendorProfile,
+  updateVendorCoverImage,
   updateVendorProfile,
   updateVendorServiceAvailability,
   vendorLogin,
@@ -54,6 +55,11 @@ router.get("/profile", getVendorProfile);
  * update vendor profile data
  */
 router.patch("/profile", updateVendorProfile);
+
+/**
+ * update vendor profile picture
+ */
+router.patch("/profile-image", handleImages, updateVendorCoverImage);
 
 /**
  * update service avialability status of vendor
