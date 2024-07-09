@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import { adminRoute, vendorRoute } from "./routes";
 import { connectDB } from "./config/db";
 import dotenv from "./config/dotenv";
+import path from "path";
 
 const PORT = dotenv.PORT;
 
@@ -11,6 +12,8 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// image storage path config
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 /**
  * Config Routes
