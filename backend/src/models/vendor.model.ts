@@ -11,7 +11,7 @@ interface IVendorDoc extends Document {
   address: string;
   password: string;
   salt: string;
-  serviceAvaialble: boolean;
+  serviceAvailable: boolean;
   rating: string;
   foods: [IFoodDoc];
   coverImages: [string];
@@ -28,7 +28,7 @@ const VendorSchema = new Schema(
     address: { type: String },
     password: { type: String, required: true },
     salt: { type: String, required: true },
-    serviceAvaialble: { type: Boolean },
+    serviceAvailable: { type: Boolean },
     rating: { type: String },
     foods: [
       {

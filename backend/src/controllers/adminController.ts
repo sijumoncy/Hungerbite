@@ -56,7 +56,7 @@ export const createVendor = async (
     return res.json({ message: "A Vendor with this email id is exist" });
   }
 
-  // ecrypt password by generate salt
+  // encrypt password by generate salt
   const generatedSalt = await generateSalt();
   const hashedPwd = await hashPassword(password, generatedSalt);
 
@@ -71,7 +71,7 @@ export const createVendor = async (
     address: address,
     rating: 0,
     salt: generatedSalt,
-    serviceAvaialble: [],
+    serviceAvailable: [],
     coverImages: [],
   });
 

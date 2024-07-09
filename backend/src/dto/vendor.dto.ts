@@ -1,4 +1,4 @@
-// Data Transfet Object for vendor inputs
+// Data Transfer Object for vendor inputs
 
 export interface ICreateVendor {
   name: string;
@@ -20,7 +20,7 @@ export interface IUpdateVendorProfileInputs {
 
 export interface IVendorLoginInputs {
   email: string;
-  pasword: string;
+  password: string;
 }
 
 export interface IVendorPayload {

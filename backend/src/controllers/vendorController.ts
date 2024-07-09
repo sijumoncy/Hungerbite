@@ -14,14 +14,14 @@ export const vendorLogin = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { email, pasword } = <IVendorLoginInputs>req.body;
+  const { email, password } = <IVendorLoginInputs>req.body;
 
   const vendor = await findVendor(undefined, email);
 
   if (vendor !== null) {
     // validation
     const validated = await verifyPassword(
-      pasword,
+      password,
       vendor.password,
       vendor.salt
     );
@@ -32,7 +32,7 @@ export const vendorLogin = async (
         foodTypes: vendor.foodType,
         name: vendor.name,
       });
-      return res.json({ message: "Login successfull", token: token });
+      return res.json({ message: "Login successful", token: token });
     } else {
       return res.json({ message: "password is not valid" });
     }
@@ -125,7 +125,7 @@ export const updateVendorServiceAvailability = async (
   if (user) {
     const existingVendor = await findVendor(user._id);
     if (existingVendor !== null) {
-      existingVendor.serviceAvaialble = !existingVendor.serviceAvaialble;
+      existingVendor.serviceAvailable = !existingVendor.serviceAvailable;
       const updatedVendor = await existingVendor.save();
       return res.json({ message: "updated successfully", data: updatedVendor });
     }
@@ -145,7 +145,7 @@ export const addFoodController = async (
 ) => {
   const user = req.user;
   if (user) {
-    const { category, description, foordType, name, price, readyTime } = <
+    const { category, description, foodType, name, price, readyTime } = <
       ICreateFoodInput
     >req.body;
 
@@ -159,7 +159,7 @@ export const addFoodController = async (
         name: name,
         description: description,
         category: category,
-        foordType: foordType,
+        foodType: foodType,
         readyTime: readyTime,
         price: price,
         rating: 0,
@@ -177,7 +177,7 @@ export const addFoodController = async (
 
 /**
  * Get Food by filters
- * id , venodorId , category
+ * id , vendorId , category
  */
 export const findFood = async (
   id: string | undefined,
@@ -195,7 +195,7 @@ export const findFood = async (
 
 /**
  * get all food
- * TODO : implement paginations later
+ * TODO : implement pagination later
  */
 export const getFoodController = async (
   req: Request,

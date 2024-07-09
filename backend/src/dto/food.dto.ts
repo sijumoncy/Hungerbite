@@ -2,7 +2,7 @@ export interface ICreateFoodInput {
   name: string;
   description: string;
   category: string;
-  foordType: string;
+  foodType: string;
   readyTime: string;
   price: string;
 }
