@@ -5,6 +5,7 @@ import { verifyPassword } from "../utils";
 import { generateToken } from "../utils/token";
 import { ICreateFoodInput } from "../dto/food.dto";
 import { FoodModel } from "../models/food.model";
+import { OrderModel } from "../models/order.model";
 
 /**
  * Vendor Login
@@ -211,4 +212,81 @@ export const getFoodController = async (
  */
 export const getFoodById = async (id: string) => {
   return findFood(id);
+};
+
+/**
+ * get orders of vendor
+ */
+export const getVendorOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const vendor = req.user;
+
+  if (vendor) {
+    const orders = await OrderModel.find({ vendorId: vendor._id }).populate(
+      "item.food"
+    );
+
+    if (orders?.length > 0) {
+      return res.status(200).json(orders);
+    }
+  }
+  return res.status(404).json({ message: "order not found" });
+};
+
+/**
+ * get vendor order by id
+ */
+export const getVendorOrderById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const vendor = req.user;
+  const orderId = req.params.id;
+
+  if (vendor && orderId) {
+    const order = await OrderModel.findOne({
+      vendorId: vendor._id,
+      orderId: orderId,
+    }).populate("item.food");
+
+    if (order) {
+      return res.status(200).json(order);
+    }
+  }
+  return res.status(404).json({ message: "order not found" });
+};
+
+/**
+ * update vendor order status
+ */
+export const processVendorOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const vendor = req.user;
+  const orderId = req.params.id;
+  const { status, remarks, time } = req.body;
+
+  if (vendor && orderId) {
+    const order = await OrderModel.findById(orderId).populate("food");
+
+    order.orderStatus = status;
+    order.remarks = remarks;
+    if (time) {
+      order.readyTime = time;
+    }
+
+    const orderResult = await order.save();
+    if (orderResult) {
+      return res
+        .status(201)
+        .json({ message: "order status updated", data: orderResult });
+    }
+  }
+  return res.status(400).json({ message: "unable to process the order" });
 };

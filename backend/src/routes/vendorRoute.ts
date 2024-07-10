@@ -3,7 +3,10 @@ import {
   addFoodController,
   getFoodById,
   getFoodController,
+  getVendorOrderById,
+  getVendorOrders,
   getVendorProfile,
+  processVendorOrder,
   updateVendorCoverImage,
   updateVendorProfile,
   updateVendorServiceAvailability,
@@ -70,5 +73,20 @@ router.patch("/service", updateVendorServiceAvailability);
  * Food or Menu
  */
 router.post("/food", handleImages, addFoodController);
+
+/**
+ * get orders of vendor
+ */
+router.get("/orders", getVendorOrders);
+
+/**
+ * update vendor order status
+ */
+router.put("/order/:id/process", processVendorOrder);
+
+/**
+ * get vendor order by id
+ */
+router.get("/order/:id", getVendorOrderById);
 
 export { router as vendorRoute };

@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { IFoodDoc } from "./food.model";
 
-interface IVendorDoc extends Document {
+export interface IVendorDoc extends Document {
   name: string;
   ownerName: string;
   foodType: [string];

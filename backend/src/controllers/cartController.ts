@@ -3,7 +3,6 @@ import { generateUUIDWithNamespace } from "../utils";
 import { ICart, UserModel } from "../models/user.model";
 import { OrderInputs } from "../dto/cart.dto";
 import { FoodModel } from "../models/food.model";
-import { OrderItem, OrderModel } from "../models/order.model";
 
 /**
  * create or add to cart

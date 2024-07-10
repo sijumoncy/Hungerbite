@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import { IOrderDoc } from "./order.model";
 import { IFoodDoc } from "./food.model";
 
-interface ICart {
+export interface ICart {
   food: IFoodDoc;
   count: number;
   total: number;

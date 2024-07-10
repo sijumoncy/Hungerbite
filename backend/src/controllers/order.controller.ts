@@ -52,6 +52,7 @@ export const createOrder = async (
       if (cartItems.length > 0) {
         const newOrder = await OrderModel.create({
           orderId: orderId,
+          vendorId: foods[0].vendorId,
           items: cartItems,
           totalAmount: totalAmount,
           orderDate: new Date(),
