@@ -220,7 +220,18 @@ export const getUserProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const user = req.user;
+
+  if (user) {
+    const userProfile = await UserModel.findById(user._id);
+    if (userProfile) {
+      res.status(200).json(userProfile);
+    }
+  }
+
+  return res.status(404).json({ message: "user not found" });
+};
 
 /**
  * update user profile
