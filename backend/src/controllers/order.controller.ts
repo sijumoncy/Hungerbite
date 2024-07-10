@@ -82,35 +82,49 @@ export const createOrder = async (
 };
 
 /**
- * get vendor by Id
+ * get all orders of user
  */
 export const getOrders = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const vendorId = req.params.id;
+  const user = req.user;
 
-  if (vendor !== null) {
-    return res.json(vendor);
+  if (user) {
+    const profile = await UserModel.findById(user._id);
+    if (profile) {
+      return res.status(200).json(profile.orders);
+    }
   }
 
-  return null;
+  return res.status(404).json({ message: "user not found" });
 };
 
 /**
- * get vendor by Id
+ * get order details of the user by id
  */
 export const getOrderById = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const vendorId = req.params.id;
+  const user = req.user;
+  const orderId = req.params.id;
 
-  if (vendor !== null) {
-    return res.json(vendor);
+  if (user && orderId) {
+    const userProfile = await UserModel.findById(user._id).populate({
+      path: "orders",
+      match: { _id: orderId },
+      populate: {
+        path: "items.food",
+        model: "food",
+      },
+    });
+    if (userProfile) {
+      return res.status(200).json(userProfile.orders);
+    }
   }
 
-  return null;
+  return res.status(404).json({ message: "order not found" });
 };
