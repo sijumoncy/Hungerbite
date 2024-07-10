@@ -320,6 +320,7 @@ export const createVendorOffers = async (
       bank,
       bankIdentificationNumber,
       isActive,
+      minPurchase
     } = <CreateOfferInputs>req.body;
 
     const existingVendor = await findVendor(vendor._id);
@@ -337,6 +338,7 @@ export const createVendorOffers = async (
         bank,
         bankIdentificationNumber,
         isActive,
+        minPurchase,
         vendors: [existingVendor],
       });
 
@@ -392,7 +394,55 @@ export const updateVendorOffers = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const vendor = req.user;
+  const offerId = req.params.id;
+
+  if (vendor) {
+    const {
+      title,
+      description,
+      offerType,
+      offerPrice,
+      pincode,
+      promoCode,
+      promoType,
+      validFrom,
+      validTill,
+      bank,
+      bankIdentificationNumber,
+      isActive,
+      minPurchase
+    } = <CreateOfferInputs>req.body;
+
+    // getting current offer with id
+    const currentOffer = await OfferModel.findById(offerId);
+
+    if (currentOffer) {
+      const existingVendor = await findVendor(vendor._id);
+
+      if (existingVendor) {
+        currentOffer.title = title;
+        currentOffer.description = description;
+        currentOffer.offerType = offerType;
+        currentOffer.offerPrice = offerPrice;
+        currentOffer.pincode = pincode;
+        currentOffer.promoCode = promoCode;
+        currentOffer.promoType = promoType;
+        currentOffer.validFrom = validFrom;
+        currentOffer.validTill = validTill;
+        currentOffer.bank = bank;
+        currentOffer.bankIdentificationNumber = bankIdentificationNumber;
+        currentOffer.isActive = isActive;
+        currentOffer.minPurchase = minPurchase
+
+        const updatedResult = await currentOffer.save()
+        return res.status(201).json({message : "updated offer successfully", data : updatedResult})
+      }
+    }
+    return res.status(400).json({ message: "failed to create offer" });
+  }
+};
 /**
  * delete vendor offers
  */
@@ -400,4 +450,6 @@ export const deleteVendorOffers = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  
+};
