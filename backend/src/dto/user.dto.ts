@@ -11,6 +11,14 @@ export class SignupUserInputs {
   password: string;
 }
 
+export class LoginUserInputs {
+  @IsEmail()
+  email: string;
+
+  @Length(6, 12)
+  password: string;
+}
+
 export interface IUserPayload {
   _id: string;
   email: string;

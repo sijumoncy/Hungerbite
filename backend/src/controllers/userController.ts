@@ -2,12 +2,13 @@ import express, { NextFunction, Request, Response } from "express";
 
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
-import { SignupUserInputs } from "../dto/user.dto";
+import { SignupUserInputs, LoginUserInputs } from "../dto/user.dto";
 import {
   generateOneTimePassword,
   generateSalt,
   hashPassword,
   sendOTP,
+  verifyPassword,
 } from "../utils";
 import { UserModel } from "../models/user.model";
 import { generateToken } from "../utils/token";
@@ -24,7 +25,7 @@ export const userSignup = async (
   const userSignupInputs = plainToClass(SignupUserInputs, req.body);
 
   const InputErrors = await validate(userSignupInputs, {
-    ValidationError: { target: true },
+    validationError: { target: true },
   });
 
   if (InputErrors.length > 0) {
@@ -94,7 +95,48 @@ export const userLogin = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const loginInputs = plainToClass(LoginUserInputs, req.body);
+  const loginErrors = await validate(loginInputs, {
+    validationError: { target: false },
+  });
+
+  if (loginErrors.length > 0) {
+    return res
+      .status(411)
+      .json({ message: "input validation error", error: loginErrors });
+  }
+
+  const { email, password } = loginInputs;
+
+  const existingUser = await UserModel.findOne({ email: email });
+
+  if (existingUser) {
+    const validation = await verifyPassword(
+      password,
+      existingUser.password,
+      existingUser.salt
+    );
+
+    if (validation) {
+      const token = await generateToken({
+        _id: existingUser.id,
+        email: existingUser.email,
+        verified: existingUser.verified,
+      });
+
+      return res
+        .status(201)
+        .json({ message: "login successful", token: token });
+    }
+
+    return res.status(404).json({ message: "invalid password" });
+  }
+
+  return res
+    .status(404)
+    .json({ message: "user not found. please register to continue" });
+};
 
 /**
  * verify user
@@ -138,13 +180,34 @@ export const userVerify = async (
 };
 
 /**
- * otp generate
+ * otp generate with auth after login
  */
 export const generateOTP = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const user = req.user;
+
+  if (user) {
+    const profile = await UserModel.findById(user._id);
+
+    if (profile) {
+      const { otp, expiry } = await generateOneTimePassword();
+
+      profile.otp = otp;
+      profile.otp_expiry = expiry;
+
+      const response = await sendOTP(otp, profile.phone);
+
+      return res
+        .status(200)
+        .json({ message: "OTP sent to your registered phone number" });
+    }
+  }
+
+  return res.status(404).json({ message: "user not found" });
+};
 
 /**
  * get user profile
