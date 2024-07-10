@@ -2,7 +2,11 @@ import express, { NextFunction, Request, Response } from "express";
 
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
-import { SignupUserInputs, LoginUserInputs } from "../dto/user.dto";
+import {
+  SignupUserInputs,
+  LoginUserInputs,
+  UpdateUserProfileInputs,
+} from "../dto/user.dto";
 import {
   generateOneTimePassword,
   generateSalt,
@@ -225,4 +229,31 @@ export const updateUserProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const user = req.user;
+
+  const updateProfileInputs = plainToClass(UpdateUserProfileInputs, req.body);
+  const profileUpdateError = await validate(updateProfileInputs, {
+    validationError: { target: false },
+  });
+
+  if (profileUpdateError.length > 0) {
+    return res.status(400).json(profileUpdateError);
+  }
+
+  const { address, firstName, lastName } = updateProfileInputs;
+
+  if (user) {
+    const profile = await UserModel.findById(user._id);
+    if (profile) {
+      profile.address = address;
+      profile.firstName = firstName;
+      profile.lastName = lastName;
+      const result = await profile.save();
+
+      return res
+        .status(201)
+        .json({ message: "profile updated successfully", data: result });
+    }
+  }
+};

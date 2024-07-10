@@ -19,6 +19,17 @@ export class LoginUserInputs {
   password: string;
 }
 
+export class UpdateUserProfileInputs {
+  @Length(2, 20)
+  firstName: string;
+
+  @Length(2, 20)
+  lastName: string;
+
+  @Length(2, 20)
+  address: string;
+}
+
 export interface IUserPayload {
   _id: string;
   email: string;
