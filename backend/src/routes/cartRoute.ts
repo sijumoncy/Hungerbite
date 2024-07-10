@@ -3,9 +3,8 @@ import express, { NextFunction, Request, Response } from "express";
 import { authenticate } from "../middlewares/commonAuth";
 import {
   addtoCart,
-  deleteCartById,
+  deleteCart,
   getCart,
-  getCartById,
 } from "../controllers/cartController";
 
 const router = express.Router();
@@ -25,13 +24,8 @@ router.post("/", addtoCart);
 router.post("/", getCart);
 
 /**
- * get cart by id
- */
-router.post("/:id", getCartById);
-
-/**
  * delete cart
  */
-router.post("/:id", deleteCartById);
+router.post("/:id", deleteCart);
 
 export { router as cartRoute };

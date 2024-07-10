@@ -1,12 +1,12 @@
 import express, { Request, Response, NextFunction } from "express";
 import { generateUUIDWithNamespace } from "../utils";
-import { UserModel } from "../models/user.model";
+import { ICart, UserModel } from "../models/user.model";
 import { OrderInputs } from "../dto/cart.dto";
 import { FoodModel } from "../models/food.model";
 import { OrderItem, OrderModel } from "../models/order.model";
 
 /**
- * create cart
+ * create or add to cart
  */
 export const addtoCart = async (
   req: Request,
@@ -71,7 +71,7 @@ export const addtoCart = async (
 };
 
 /**
- * get all cart of user
+ * get cart of user
  */
 export const getCart = async (
   req: Request,
@@ -81,67 +81,33 @@ export const getCart = async (
   const user = req.user;
 
   if (user) {
-    const profile = await UserModel.findById(user._id);
+    const profile = await UserModel.findById(user._id).populate("cart.food");
     if (profile) {
-      return res.status(200).json(profile.orders);
+      return res.status(200).json(profile.cart);
     }
   }
 
-  return res.status(404).json({ message: "user not found" });
+  return res.status(404).json({ message: "cart is empty" });
 };
 
 /**
- * get cart details of the user by id
+ * delete or clear cart
  */
-export const getCartById = async (
+export const deleteCart = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const user = req.user;
-  const orderId = req.params.id;
 
-  if (user && orderId) {
-    const userProfile = await UserModel.findById(user._id).populate({
-      path: "orders",
-      match: { _id: orderId },
-      populate: {
-        path: "items.food",
-        model: "food",
-      },
-    });
-    if (userProfile) {
-      return res.status(200).json(userProfile.orders);
+  if (user) {
+    const profile = await UserModel.findById(user._id).populate("cart.food");
+    if (profile !== null) {
+      profile.cart = [] as unknown as [ICart];
+      const result = await profile.save();
+      return res.status(200).json(result);
     }
   }
 
-  return res.status(404).json({ message: "order not found" });
-};
-
-/**
- * delete cart by id
- */
-export const deleteCartById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = req.user;
-  const orderId = req.params.id;
-
-  if (user && orderId) {
-    const userProfile = await UserModel.findById(user._id).populate({
-      path: "orders",
-      match: { _id: orderId },
-      populate: {
-        path: "items.food",
-        model: "food",
-      },
-    });
-    if (userProfile) {
-      return res.status(200).json(userProfile.orders);
-    }
-  }
-
-  return res.status(404).json({ message: "order not found" });
+  return res.status(404).json({ message: "cart is already empty" });
 };
