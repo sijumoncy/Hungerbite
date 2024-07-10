@@ -6,7 +6,7 @@ export type PromoType = "BANK" | "CARD" | "ALL";
 
 export interface IOfferDoc extends Document {
   offerType: OfferType;
-  vendors: [IVendorDoc] | [];
+  vendors: [IVendorDoc];
   title: string;
   description: string;
   minPurchase: number;

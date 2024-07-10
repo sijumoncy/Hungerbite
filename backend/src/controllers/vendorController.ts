@@ -10,7 +10,7 @@ import { generateToken } from "../utils/token";
 import { ICreateFoodInput } from "../dto/food.dto";
 import { FoodModel } from "../models/food.model";
 import { OrderModel } from "../models/order.model";
-import { OfferModel, VendorModel } from "../models";
+import { IVendorDoc, OfferModel, VendorModel } from "../models";
 
 /**
  * Vendor Login
@@ -357,7 +357,34 @@ export const getVendorOffers = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const vendor = req.user;
+  if (vendor) {
+    let vendorOffers = Array();
+    const offers = await OfferModel.find().populate("vendors");
+
+    if (offers) {
+      // get vendor specific and generic offers
+      offers.forEach((offer) => {
+        if (offer.vendors?.length > 0) {
+          offer.vendors.forEach((vn) => {
+            if (vn._id.toString() === vendor._id) {
+              vendorOffers.push(offer);
+            }
+          });
+        }
+
+        if (offer.offerType === "GENERIC") {
+          vendorOffers.push(offer);
+        }
+      });
+
+      return res.status(200).json(vendorOffers);
+    }
+  }
+
+  return res.status(404).json({ message: "Offer not found" });
+};
 /**
  * edit vendor offers
  */
