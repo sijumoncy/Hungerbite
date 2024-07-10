@@ -7,4 +7,6 @@ export default {
   TWILLIO_ACC_ID: process.env.TWILLIO_ACC_ID || "",
   TWILLIO_TOKEN: process.env.TWILLIO_TOKEN || "",
   TWILLIO_NUMBER: process.env.TWILLIO_NUMBER || "",
+  UUID_NAMESPACE:
+    process.env.UUID_NAMESPACE || "1b671a64-40d5-491e-99b0-da01ff1f3341",
 };

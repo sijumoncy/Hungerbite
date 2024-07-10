@@ -66,6 +66,7 @@ export const userSignup = async (
     verified: false,
     lat: 0,
     lng: 0,
+    order : []
   });
 
   if (result) {

@@ -5,7 +5,7 @@ export interface IFoodDoc extends Document {
   name: string;
   description: string;
   category: string;
-  foordType: string;
+  foodType: string;
   readyTime: string;
   price: string;
   rating: string;
@@ -18,7 +18,7 @@ const FoodSchema = new Schema(
     name: { type: String, required: true },
     description: { type: String, required: true },
     category: { type: String },
-    foordType: { type: String, required: true },
+    foodType: { type: String, required: true },
     readyTime: { type: String },
     price: { type: String, required: true },
     rating: { type: String },
@@ -34,6 +34,6 @@ const FoodSchema = new Schema(
   }
 );
 
-const FoodModel = mongoose.model<IFoodDoc>("Food", FoodSchema);
+const FoodModel = mongoose.model<IFoodDoc>("food", FoodSchema);
 
 export { FoodModel };
