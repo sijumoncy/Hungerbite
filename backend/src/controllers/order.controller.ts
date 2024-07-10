@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { generateUUIDWithNamespace } from "../utils";
-import { UserModel } from "../models/user.model";
+import { ICart, UserModel } from "../models/user.model";
 import { OrderInputs } from "../dto/cart.dto";
 import { FoodModel } from "../models/food.model";
 import { OrderItem, OrderModel } from "../models/order.model";
@@ -64,6 +64,8 @@ export const createOrder = async (
         if (newOrder) {
           // update orders to user acc ( relation )
           userProfile.orders.push(newOrder);
+          // order placed with cart items and clear the cart
+          userProfile.cart = [] as unknown as [ICart];
           await userProfile.save();
 
           return res.status(201).json({

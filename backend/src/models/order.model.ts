@@ -27,11 +27,11 @@ export interface IOrderDoc extends Document {
   paymentMode: PaymentModeTypes;
   paymentResponse: string; // TODO : need to handle this with a type alter based on payment gateway
   orderStatus: OrderStatusTypes;
-  remarks: string;
-  deliveryId: string;
-  isOfferApplied: boolean;
-  offerId: string;
-  readyTime: number;
+  remarks?: string;
+  deliveryId?: string;
+  isOfferApplied?: boolean;
+  offerId?: string;
+  readyTime?: number;
 }
 
 const OrderSchema = new Schema(
