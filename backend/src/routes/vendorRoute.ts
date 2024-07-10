@@ -1,13 +1,17 @@
 import express, { NextFunction, Request, Response } from "express";
 import {
   addFoodController,
+  createVendorOffers,
+  deleteVendorOffers,
   getFoodById,
   getFoodController,
+  getVendorOffers,
   getVendorOrderById,
   getVendorOrders,
   getVendorProfile,
   processVendorOrder,
   updateVendorCoverImage,
+  updateVendorOffers,
   updateVendorProfile,
   updateVendorServiceAvailability,
   vendorLogin,
@@ -74,6 +78,7 @@ router.patch("/service", updateVendorServiceAvailability);
  */
 router.post("/food", handleImages, addFoodController);
 
+// =================================== orders =======================
 /**
  * get orders of vendor
  */
@@ -88,5 +93,26 @@ router.put("/order/:id/process", processVendorOrder);
  * get vendor order by id
  */
 router.get("/order/:id", getVendorOrderById);
+
+// ================================= offers ======================
+/**
+ * add vendor offers
+ */
+router.post("/offers", createVendorOffers);
+
+/**
+ * get vendor offers
+ */
+router.get("/offers", getVendorOffers);
+
+/**
+ * update vendor offers
+ */
+router.put("/offers/:id", updateVendorOffers);
+
+/**
+ * delete vendor offers
+ */
+router.delete("/offers/:id", deleteVendorOffers);
 
 export { router as vendorRoute };

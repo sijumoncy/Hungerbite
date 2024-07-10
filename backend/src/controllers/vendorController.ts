@@ -1,11 +1,16 @@
 import express, { Request, Response, NextFunction } from "express";
-import { IUpdateVendorProfileInputs, IVendorLoginInputs } from "../dto";
+import {
+  CreateOfferInputs,
+  IUpdateVendorProfileInputs,
+  IVendorLoginInputs,
+} from "../dto";
 import { findVendor } from "./adminController";
 import { verifyPassword } from "../utils";
 import { generateToken } from "../utils/token";
 import { ICreateFoodInput } from "../dto/food.dto";
 import { FoodModel } from "../models/food.model";
 import { OrderModel } from "../models/order.model";
+import { OfferModel, VendorModel } from "../models";
 
 /**
  * Vendor Login
@@ -290,3 +295,82 @@ export const processVendorOrder = async (
   }
   return res.status(400).json({ message: "unable to process the order" });
 };
+
+/**
+ * add vendor offers
+ */
+export const createVendorOffers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const vendor = req.user;
+
+  if (vendor) {
+    const {
+      title,
+      description,
+      offerType,
+      offerPrice,
+      pincode,
+      promoCode,
+      promoType,
+      validFrom,
+      validTill,
+      bank,
+      bankIdentificationNumber,
+      isActive,
+    } = <CreateOfferInputs>req.body;
+
+    const existingVendor = await findVendor(vendor._id);
+    if (existingVendor) {
+      const offerCreated = await OfferModel.create({
+        title,
+        description,
+        offerType,
+        offerPrice,
+        pincode,
+        promoCode,
+        promoType,
+        validFrom,
+        validTill,
+        bank,
+        bankIdentificationNumber,
+        isActive,
+        vendors: [existingVendor],
+      });
+
+      if (offerCreated) {
+        return res
+          .status(201)
+          .json({ message: "Offer Created Successfully", data: offerCreated });
+      }
+    }
+    return res.status(400).json({ message: "failed to create offer" });
+  }
+};
+
+/**
+ * get vendor offers
+ */
+export const getVendorOffers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
+/**
+ * edit vendor offers
+ */
+export const updateVendorOffers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
+/**
+ * delete vendor offers
+ */
+export const deleteVendorOffers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};

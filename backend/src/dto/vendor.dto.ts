@@ -1,5 +1,8 @@
 // Data Transfer Object for vendor inputs
 
+import { IVendorDoc } from "../models";
+import { OfferType } from "../models/offer.model";
+
 export interface ICreateVendor {
   name: string;
   ownerName: string;
@@ -28,4 +31,21 @@ export interface IVendorPayload {
   email: string;
   name: string;
   foodTypes: string[];
+}
+
+export interface CreateOfferInputs {
+  offerType: OfferType;
+  vendors: [IVendorDoc] | [];
+  title: string;
+  description: string;
+  minPurchase: number;
+  offerPrice: number;
+  validFrom: Date;
+  validTill: Date;
+  promoCode: string;
+  promoType: string;
+  pincode: string;
+  bank: [string];
+  bankIdentificationNumber: [Number];
+  isActive: boolean;
 }
