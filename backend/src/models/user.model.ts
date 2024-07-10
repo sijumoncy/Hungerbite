@@ -1,5 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { IOrderDoc } from "./order.model";
+import { IFoodDoc } from "./food.model";
+
+interface ICart {
+  food: IFoodDoc;
+  count: number;
+  total: number;
+}
 
 interface IUserDoc extends Document {
   email: string;
@@ -14,6 +21,7 @@ interface IUserDoc extends Document {
   otp_expiry: Date;
   lat: number;
   lng: number;
+  cart: [ICart];
   orders: [IOrderDoc];
 }
 
@@ -31,6 +39,13 @@ const UserSchema = new Schema(
     otp_expiry: { type: Date, required: true },
     lat: { type: Number },
     lng: { type: Number },
+    cart: [
+      {
+        food: { type: Schema.Types.ObjectId, ref: "food" },
+        count: { type: Number },
+        total: { type: Number },
+      },
+    ],
     orders: [{ type: Schema.Types.ObjectId, ref: "order" }],
   },
   {
