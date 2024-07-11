@@ -320,7 +320,7 @@ export const createVendorOffers = async (
       bank,
       bankIdentificationNumber,
       isActive,
-      minPurchase
+      minPurchase,
     } = <CreateOfferInputs>req.body;
 
     const existingVendor = await findVendor(vendor._id);
@@ -412,7 +412,7 @@ export const updateVendorOffers = async (
       bank,
       bankIdentificationNumber,
       isActive,
-      minPurchase
+      minPurchase,
     } = <CreateOfferInputs>req.body;
 
     // getting current offer with id
@@ -434,10 +434,12 @@ export const updateVendorOffers = async (
         currentOffer.bank = bank;
         currentOffer.bankIdentificationNumber = bankIdentificationNumber;
         currentOffer.isActive = isActive;
-        currentOffer.minPurchase = minPurchase
+        currentOffer.minPurchase = minPurchase;
 
-        const updatedResult = await currentOffer.save()
-        return res.status(201).json({message : "updated offer successfully", data : updatedResult})
+        const updatedResult = await currentOffer.save();
+        return res
+          .status(201)
+          .json({ message: "updated offer successfully", data: updatedResult });
       }
     }
     return res.status(400).json({ message: "failed to create offer" });
@@ -451,5 +453,32 @@ export const deleteVendorOffers = async (
   res: Response,
   next: NextFunction
 ) => {
-  
+  const vendor = req.user;
+  const offerId = req.params.id;
+
+  if (vendor && offerId) {
+    const offer = await OfferModel.findById(offerId).populate("vendors");
+
+    /**
+     * check the vendor is in the offer vendors list
+     * delete offer directly if it is GENERIC type
+     * if yes remove from the list
+     * if list empty remove the offer
+     */
+    if (offer) {
+      const filteredVendorsList = offer.vendors.filter(
+        (vn) => vn._id.toString() !== vendor._id.toString()
+      );
+
+      if (filteredVendorsList.length > 0 && offer.offerType !== "GENERIC") {
+        offer.vendors = filteredVendorsList as [IVendorDoc];
+        await offer.save();
+      } else {
+        await offer.deleteOne();
+      }
+      return res.status(200).json({ message: "offer successfully deleted" });
+    }
+  }
+
+  return res.status(411).json({ message: "Offer not found" });
 };
