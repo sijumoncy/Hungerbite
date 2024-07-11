@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-import { VendorModel } from "../models";
+import { OfferModel, VendorModel } from "../models";
 import { IFoodDoc } from "../models/food.model";
 
 /**
@@ -121,4 +121,23 @@ export const getRestaurantDetails = async (
   }
 
   return res.status(400).json({ message: "Restaurant not found" });
+};
+
+/**
+ * get offers
+ */
+export const getAvailableOffers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const pincode = req.params.pincode;
+
+  const offers = await OfferModel.find({ pincode: pincode });
+
+  if (offers) {
+    return res.status(200).json(offers);
+  }
+
+  return res.status(400).json({ message: "Offers not found" });
 };
