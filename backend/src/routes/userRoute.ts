@@ -1,11 +1,13 @@
 import express, { NextFunction, Request, Response } from "express";
 import {
+  applyOffer,
   generateOTP,
   getUserProfile,
   updateUserProfile,
   userLogin,
   userSignup,
   userVerify,
+  validateOffer,
 } from "../controllers";
 import { authenticate } from "../middlewares/commonAuth";
 
@@ -26,5 +28,15 @@ router.get("/otp", generateOTP);
 router.get("/profile", getUserProfile);
 
 router.patch("/profile", updateUserProfile);
+
+/**
+ * validate Offer
+ */
+router.patch("/validate-offer/:id", validateOffer);
+
+/**
+ * Apply Offer
+ */
+router.patch("/apply-offer/:id", applyOffer);
 
 export { router as userRoute };

@@ -16,6 +16,7 @@ import {
 } from "../utils";
 import { UserModel } from "../models/user.model";
 import { generateToken } from "../utils/token";
+import { OfferModel } from "../models";
 
 /**
  * signup user
@@ -66,7 +67,7 @@ export const userSignup = async (
     verified: false,
     lat: 0,
     lng: 0,
-    order : []
+    order: [],
   });
 
   if (result) {
@@ -268,4 +269,55 @@ export const updateUserProfile = async (
         .json({ message: "profile updated successfully", data: result });
     }
   }
+
+  return res.status(404).json({ message: "failed to update profile" });
+};
+
+/**
+ * validate and apply offer
+ */
+export const validateOffer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  const offerId = req.params._id;
+  const offer = await OfferModel.findById(offerId);
+  if (offer && offer.isActive) {
+    if (offer.validTill >= new Date()) {
+      return res
+        .status(200)
+        .json({ message: "offer valid", valid: true, offer: offer });
+    }
+    offer.isActive = false;
+    await offer.save();
+  }
+  return res.status(400).json({ message: "Offer Expired", valid: false });
+};
+/**
+ * validate and apply offer
+ */
+export const applyOffer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  const offerId = req.params.id;
+
+  if (user) {
+    const offer = await OfferModel.findById(offerId);
+    if (offer && offer.isActive) {
+      if (offer.promoType === "USER") {
+        //TODO: only can applied once per user
+      } else {
+        return res
+          .status(200)
+          .json({ message: "offer valid", valid: true, offer: offer });
+      }
+    }
+    return res.status(400).json({ message: "Offer Expired", valid: false });
+  }
+  return res.status(400).json({ message: "offer not applied" });
 };
