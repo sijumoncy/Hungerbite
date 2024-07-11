@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import {
-  applyOffer,
   generateOTP,
+  generatePayment,
   getUserProfile,
   updateUserProfile,
   userLogin,
@@ -35,8 +35,8 @@ router.patch("/profile", updateUserProfile);
 router.patch("/validate-offer/:id", validateOffer);
 
 /**
- * Apply Offer
+ * generate payment
  */
-router.patch("/apply-offer/:id", applyOffer);
+router.patch("/generate-payment", generatePayment);
 
 export { router as userRoute };

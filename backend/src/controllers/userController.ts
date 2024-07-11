@@ -16,7 +16,7 @@ import {
 } from "../utils";
 import { UserModel } from "../models/user.model";
 import { generateToken } from "../utils/token";
-import { OfferModel } from "../models";
+import { OfferModel, OrderModel, TransactionModel } from "../models";
 
 /**
  * signup user
@@ -295,29 +295,56 @@ export const validateOffer = async (
   }
   return res.status(400).json({ message: "Offer Expired", valid: false });
 };
+
+// ======================== PAYMENT ================================
+
 /**
- * validate and apply offer
+ * generate payment for the order
  */
-export const applyOffer = async (
+export const generatePayment = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const user = req.user;
-  const offerId = req.params.id;
-
+  const { orderId, paymentMode, offerId } = req.body;
   if (user) {
-    const offer = await OfferModel.findById(offerId);
-    if (offer && offer.isActive) {
-      if (offer.promoType === "USER") {
-        //TODO: only can applied once per user
-      } else {
-        return res
-          .status(200)
-          .json({ message: "offer valid", valid: true, offer: offer });
-      }
+    // calculate payment from orderId
+    const order = await OrderModel.findById(orderId);
+    if (order && order.orderStatus !== "rejected") {
+      // get offer price else consider as 0
+      const offer = await OfferModel.findById(offerId);
+      const offerPrice =
+        offer?.offerPrice > 0 && offer.isActive ? offer.offerPrice : 0;
+      // calculate payable amount
+      const orderTotalAmount = order.totalAmount;
+      const payableAmount = orderTotalAmount - offerPrice;
+
+      // TODO : setup and add gateway + gateway charge etc logic here ========================
+      // TODO : transaction Id need to connect with order to update order status
+
+
+      // add transaction record of the purchase
+      const transaction = await TransactionModel.create({
+        user: user._id,
+        vendorId: order.vendorId,
+        orderId: order.orderId,
+        orderAmount: orderTotalAmount,
+        transactionAmount: payableAmount,
+        offerUsed: offer || "NA",
+        status: "OPEN",
+        paymentMode: paymentMode,
+        paymentResponse: "",
+      });
+
+      // return the transaction details
+      return res.status(201).json({ message: "success", data: transaction });
     }
-    return res.status(400).json({ message: "Offer Expired", valid: false });
+    return res.status(400).json({
+      message: "unable to find order details or order not accepting ",
+    });
   }
-  return res.status(400).json({ message: "offer not applied" });
+  return res
+    .status(400)
+    .json({ message: "unable to generate payment details" });
 };
