@@ -13,6 +13,7 @@ export interface ITransactionDoc extends Document {
   orderId: string;
   orderAmount: number;
   transactionAmount: number;
+  transactionId: string;
   offerUsed: string;
   status: TransactionStatusType;
   paymentMode: PaymentModeTypes;
@@ -22,15 +23,16 @@ export interface ITransactionDoc extends Document {
 
 const TransactionSchema = new Schema(
   {
-    user: String,
-    vendorId: String,
-    orderId: String,
+    user: { type: Schema.Types.ObjectId, ref: "user", required: true },
+    vendorId: { type: Schema.Types.ObjectId, ref: "vendor", required: true },
+    orderId: { type: Schema.Types.ObjectId, ref: "order", required: true },
     orderAmount: Number,
     transactionAmount: Number,
     offerUsed: String,
-    status: String,
-    paymentMode: String,
+    status: { type: String, default: "PENDING" },
+    paymentMode: { type: String, default: "COD" },
     paymentResponse: String,
+    transactionId: { type: String, required: true, unique: true },
   },
   {
     toJSON: {

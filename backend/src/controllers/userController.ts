@@ -296,6 +296,15 @@ export const validateOffer = async (
   return res.status(400).json({ message: "Offer Expired", valid: false });
 };
 
+// ======================== Delivery =============================
+
+export const assignOrderForDelivery = async (orderId: string) => {
+  // get the vendor
+  // get available delivery rider
+  // find nearest delivery rider
+  // update delivery Id and order status
+};
+
 // ======================== PAYMENT ================================
 
 /**
@@ -311,6 +320,7 @@ export const generatePayment = async (
   if (user) {
     // calculate payment from orderId
     const order = await OrderModel.findById(orderId);
+
     if (order && order.orderStatus !== "rejected") {
       // get offer price else consider as 0
       const offer = await OfferModel.findById(offerId);
@@ -323,7 +333,6 @@ export const generatePayment = async (
       // TODO : setup and add gateway + gateway charge etc logic here ========================
       // TODO : transaction Id need to connect with order to update order status
 
-
       // add transaction record of the purchase
       const transaction = await TransactionModel.create({
         user: user._id,
@@ -332,10 +341,13 @@ export const generatePayment = async (
         orderAmount: orderTotalAmount,
         transactionAmount: payableAmount,
         offerUsed: offer || "NA",
-        status: "OPEN",
+        status: "PENDING",
         paymentMode: paymentMode,
         paymentResponse: "",
       });
+
+      // assign Delivery
+      await assignOrderForDelivery(orderId);
 
       // return the transaction details
       return res.status(201).json({ message: "success", data: transaction });
